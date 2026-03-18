@@ -91,8 +91,8 @@
     <div class="card">
       <h3>Cadastrar Especialidade</h3>
 
-      <!-- NOVO SELECT -->
-      <select id="listaPadrao" onchange="preencherEspecialidade()">
+      <!-- AGORA SÓ SELECT -->
+      <select id="nomeEspecialidade">
         <option value="">Selecione uma especialidade</option>
         <option>Climatério e menopausa</option>
         <option>Clínica em dor</option>
@@ -117,7 +117,6 @@
         <option>Reumatologia</option>
       </select>
 
-      <input id="nomeEspecialidade" placeholder="Nome da especialidade">
       <input id="limite" type="number" placeholder="Limite de consultas">
       <button onclick="adicionarEspecialidade()">Adicionar</button>
     </div>
@@ -134,11 +133,6 @@
     let especialidades = [];
     let pacientes = [];
 
-    function preencherEspecialidade() {
-      const select = document.getElementById("listaPadrao");
-      document.getElementById("nomeEspecialidade").value = select.value;
-    }
-
     function salvarDados() {
       localStorage.setItem("especialidades", JSON.stringify(especialidades));
       localStorage.setItem("pacientes", JSON.stringify(pacientes));
@@ -153,7 +147,7 @@
     }
 
     function adicionarEspecialidade() {
-      const nome = document.getElementById("nomeEspecialidade").value.trim();
+      const nome = document.getElementById("nomeEspecialidade").value;
       const limite = document.getElementById("limite").value;
 
       if (!nome || !limite) return;
