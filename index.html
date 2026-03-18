@@ -21,7 +21,7 @@
 
     h1 {
       text-align: center;
-      color: #FF5C8A; /* cor AFYA */
+      color: #FF5C8A;
     }
 
     .card {
@@ -32,7 +32,7 @@
       margin-bottom: 20px;
     }
 
-    input, button {
+    input, button, select {
       width: 100%;
       padding: 10px;
       margin-top: 10px;
@@ -41,7 +41,7 @@
     }
 
     button {
-      background: #FF5C8A; /* botão AFYA */
+      background: #FF5C8A;
       color: white;
       border: none;
       cursor: pointer;
@@ -53,7 +53,7 @@
 
     .especialidade {
       background: #ffffff;
-      color: #333; /* CORRIGIDO */
+      color: #333;
       padding: 10px;
       border-radius: 10px;
       margin-bottom: 10px;
@@ -66,7 +66,7 @@
       border-bottom: 1px solid #ddd;
       padding: 10px 0;
       gap: 10px;
-      color: #333; /* CORRIGIDO */
+      color: #333;
     }
 
     .actions {
@@ -90,6 +90,33 @@
 
     <div class="card">
       <h3>Cadastrar Especialidade</h3>
+
+      <!-- NOVO SELECT -->
+      <select id="listaPadrao" onchange="preencherEspecialidade()">
+        <option value="">Selecione uma especialidade</option>
+        <option>Climatério e menopausa</option>
+        <option>Clínica em dor</option>
+        <option>Ecocardiograma</option>
+        <option>Gastroenterologia</option>
+        <option>Medicina do Exercício e do Esporte</option>
+        <option>Neuropediatria (Obrigatório encaminhamento)</option>
+        <option>Pediatria</option>
+        <option>Psiquiatria da infância e da adolescência (Obrigatório encaminhamento)</option>
+        <option>Ultrassonografia (exame do mês - somente tireoide)</option>
+        <option>Pneumologia (Obrigatório encaminhamento)</option>
+        <option>Cardiologia</option>
+        <option>Dermatologia</option>
+        <option>Endocrinologia</option>
+        <option>Endócrino Pediátrica</option>
+        <option>Geriatria</option>
+        <option>Ginecologia</option>
+        <option>Neurologia</option>
+        <option>Nutrologia</option>
+        <option>Oftalmologia</option>
+        <option>Psiquiatria</option>
+        <option>Reumatologia</option>
+      </select>
+
       <input id="nomeEspecialidade" placeholder="Nome da especialidade">
       <input id="limite" type="number" placeholder="Limite de consultas">
       <button onclick="adicionarEspecialidade()">Adicionar</button>
@@ -106,6 +133,11 @@
   <script>
     let especialidades = [];
     let pacientes = [];
+
+    function preencherEspecialidade() {
+      const select = document.getElementById("listaPadrao");
+      document.getElementById("nomeEspecialidade").value = select.value;
+    }
 
     function salvarDados() {
       localStorage.setItem("especialidades", JSON.stringify(especialidades));
