@@ -1,1 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agendamento de Consultas</title>
 
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #0B1F3A;
+      color: white;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .card {
+      background: white;
+      color: black;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #1E90FF;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0d6efd;
+    }
+
+    .especialidade {
+      background: #E6F0FA;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .paciente {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+      gap: 10px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .secondary {
+      background: #6c757d;
+    }
+
+    .danger {
+      background: #dc3545;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Sistema de Agendamento</h1>
+
+    <div class="card">
+      <h3>Cadastrar Especialidade</h3>
+      <input id="nomeEspecialidade" placeholder="Nome da especialidade">
+      <input id="limite" type="number" placeholder="Limite de consultas">
+      <button onclick="adicionarEspecialidade()">Adicionar</button>
+    </div>
+
+    <div id="listaEspecialidades"></div>
+
+    <div class="card">
+      <h3>Pacientes Agendados</h3>
+      <div id="listaPacientes"></div>
+    </div>
+  </div>
+
+  <script>
+    let especialidades = [];
+    let pacientes = [];
+
+    function salvarDados() {
+      localStorage.setItem("especialidades", JSON.stringify(especialidades));
+      localStorage.setItem("pacientes", JSON.stringify(pacientes));
+    }
+
+    function carregarDados() {
+      const esp = localStorage.getItem("especialidades");
+      const pac = localStorage.getItem("pacientes");
+
+      if (esp) especialidades = JSON.parse(esp);
+      if (pac) pacientes = JSON.parse(pac);
+    }
+
+    function adicionarEspecialidade() {
+      const nome = document.getElementById("nomeEspecialidade").value.trim();
+      const limite = document.getElementById("limite").value;
+
+      if (!nome || !limite) return;
+
+      especialidades.push({ nome, limite: Number(limite) });
+
+      document.getElementById("nomeEspecialidade").value = "";
+      document.getElementById("limite").value = "";
+
+      salvarDados();
+      renderEspecialidades();
+    }
+
+    function removerEspecialidade(nome) {
+      if (!confirm("Remover especialidade e seus pacientes?")) return;
+
+      especialidades = especialidades.filter(e => e.nome !== nome);
+      pacientes = pacientes.filter(p => p.especialidade !== nome);
+
+      salvarDados();
+      renderEspecialidades();
+      renderPacientes();
+    }
+
+    function renderEspecialidades() {
+      const container = document.getElementById("listaEspecialidades");
+      container.innerHTML = "";
+
+      especialidades.forEach(esp => {
+        const count = pacientes.filter(p => p.especialidade === esp.nome).length;
+
+        const div = document.createElement("div");
+        div.className = "especialidade";
+
+        div.innerHTML = `
+          <h4>${esp.nome}</h4>
+          <p>Limite: ${esp.limite} | Agendados: ${count}</p>
+          <div class="actions">
+            <button onclick="adicionarPaciente('${esp.nome}')">Agendar</button>
+            <button class="secondary" onclick="removerEspecialidade('${esp.nome}')">Remover</button>
+          </div>
+        `;
+
+        container.appendChild(div);
+      });
+    }
+
+    function adicionarPaciente(especialidade) {
+      const nome = prompt("Nome do paciente:");
+      if (!nome) return;
+
+      const telefone = prompt("Telefone (opcional):") || "";
+
+      const count = pacientes.filter(p => p.especialidade === especialidade).length;
+      const esp = especialidades.find(e => e.nome === especialidade);
+
+      if (count >= esp.limite) {
+        alert("Limite atingido!");
+        return;
+      }
+
+      pacientes.push({
+        nome,
+        telefone,
+        especialidade,
+        confirmado: false
+      });
+
+      salvarDados();
+      renderPacientes();
+      renderEspecialidades();
+    }
+
+    function removerPaciente(index) {
+      if (!confirm("Remover paciente?")) return;
+
+      pacientes.splice(index, 1);
+
+      salvarDados();
+      renderPacientes();
+      renderEspecialidades();
+    }
+
+    function toggleConfirmacao(index) {
+      pacientes[index].confirmado = !pacientes[index].confirmado;
+
+      salvarDados();
+      renderPacientes();
+    }
+
+    function renderPacientes() {
+      const container = document.getElementById("listaPacientes");
+      container.innerHTML = "";
+
+      pacientes.forEach((p, index) => {
+        const div = document.createElement("div");
+        div.className = "paciente";
+
+        div.innerHTML = `
+          <div>
+            <strong>${p.nome}</strong><br>
+            <small>${p.especialidade}</small><br>
+            <small>${p.telefone}</small>
+          </div>
+          <div class="actions">
+            <button onclick="toggleConfirmacao(${index})">
+              ${p.confirmado ? "Confirmado" : "Confirmar"}
+            </button>
+            <button class="danger" onclick="removerPaciente(${index})">Excluir</button>
+          </div>
+        `;
+
+        container.appendChild(div);
+      });
+    }
+
+    carregarDados();
+    renderEspecialidades();
+    renderPacientes();
+  </script>
+</body>
+</html>
